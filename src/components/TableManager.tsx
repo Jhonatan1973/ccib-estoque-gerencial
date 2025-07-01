@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -6,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import { Plus, Table, Edit, Trash2, Columns } from "lucide-react";
+import { Plus, Table, Edit, Trash2, Columns, Package } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import TableProductManager from "./TableProductManager";
 
 interface TableColumn {
   id: string;
@@ -51,15 +51,37 @@ const TableManager = () => {
       ],
       createdAt: "2024-01-10",
     },
+    {
+      id: "3",
+      name: "Cozinha",
+      description: "Controle de alimentos e utensílios",
+      columns: [
+        { id: "1", name: "Nome", type: "text", required: true },
+        { id: "2", name: "Quantidade", type: "number", required: true },
+        { id: "3", name: "Data de Entrada", type: "date", required: false },
+        { id: "4", name: "Localização", type: "text", required: false },
+      ],
+      createdAt: "2024-01-08",
+    },
   ]);
 
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedTable, setSelectedTable] = useState<CustomTable | null>(null);
   const [newTableName, setNewTableName] = useState("");
   const [newTableDescription, setNewTableDescription] = useState("");
   const [newColumns, setNewColumns] = useState<TableColumn[]>([
     { id: "1", name: "Nome", type: "text", required: true },
     { id: "2", name: "Quantidade", type: "number", required: true },
   ]);
+
+  if (selectedTable) {
+    return (
+      <TableProductManager 
+        table={selectedTable} 
+        onClose={() => setSelectedTable(null)} 
+      />
+    );
+  }
 
   const addColumn = () => {
     const newColumn: TableColumn = {
@@ -251,7 +273,7 @@ const TableManager = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {tables.map((table) => (
-          <Card key={table.id} className="border-0 shadow-md hover:shadow-lg transition-shadow">
+          <Card key={table.id} className="border-0 shadow-md hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader>
               <div className="flex justify-between items-start">
                 <div>
@@ -271,14 +293,17 @@ const TableManager = () => {
                     variant="ghost" 
                     size="sm" 
                     className="text-red-600 hover:text-red-800"
-                    onClick={() => deleteTable(table.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteTable(table.id);
+                    }}
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent onClick={() => setSelectedTable(table)}>
               <div className="space-y-3">
                 <div className="flex items-center text-sm text-gray-600">
                   <Columns className="w-4 h-4 mr-2" />
@@ -298,9 +323,23 @@ const TableManager = () => {
                   )}
                 </div>
                 
-                <p className="text-xs text-gray-500 mt-2">
-                  Criada em {new Date(table.createdAt).toLocaleDateString('pt-BR')}
-                </p>
+                <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+                  <p className="text-xs text-gray-500">
+                    Criada em {new Date(table.createdAt).toLocaleDateString('pt-BR')}
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-gray-600 hover:text-gray-900"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedTable(table);
+                    }}
+                  >
+                    <Package className="w-4 h-4 mr-1" />
+                    Gerenciar
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>

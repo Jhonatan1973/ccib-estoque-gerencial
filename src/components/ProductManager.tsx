@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Plus, Search, Package, Edit, Trash2, Filter } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import ProductEditor from "./ProductEditor";
 
 interface Product {
   id: string;
@@ -26,6 +27,7 @@ const ProductManager = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   
   const [products, setProducts] = useState<Product[]>([
     {
@@ -120,6 +122,10 @@ const ProductManager = () => {
     });
   };
 
+  const updateProduct = (updatedProduct: Product) => {
+    setProducts(products.map(p => p.id === updatedProduct.id ? updatedProduct : p));
+  };
+
   const deleteProduct = (id: string) => {
     setProducts(products.filter(p => p.id !== id));
     toast({
@@ -180,6 +186,7 @@ const ProductManager = () => {
                   <SelectContent>
                     <SelectItem value="Publicações CCB">Publicações CCB</SelectItem>
                     <SelectItem value="Material de Escritório">Material de Escritório</SelectItem>
+                    <SelectItem value="Cozinha">Cozinha</SelectItem>
                     <SelectItem value="Instrumentos">Instrumentos</SelectItem>
                     <SelectItem value="Limpeza">Material de Limpeza</SelectItem>
                     <SelectItem value="Outros">Outros</SelectItem>
@@ -284,7 +291,12 @@ const ProductManager = () => {
                   </CardDescription>
                 </div>
                 <div className="flex space-x-1">
-                  <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    className="text-gray-600 hover:text-gray-900"
+                    onClick={() => setEditingProduct(product)}
+                  >
                     <Edit className="w-4 h-4" />
                   </Button>
                   <Button 
@@ -348,6 +360,16 @@ const ProductManager = () => {
             )}
           </CardContent>
         </Card>
+      )}
+
+      {/* Product Editor Modal */}
+      {editingProduct && (
+        <ProductEditor
+          product={editingProduct}
+          isOpen={!!editingProduct}
+          onClose={() => setEditingProduct(null)}
+          onUpdate={updateProduct}
+        />
       )}
     </div>
   );
