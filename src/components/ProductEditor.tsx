@@ -66,27 +66,27 @@ const ProductEditor = ({ product, isOpen, onClose, onUpdate }: ProductEditorProp
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-sm sm:max-w-md mx-4 max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Atualizar Produto</DialogTitle>
-          <DialogDescription>
+          <DialogTitle className="text-lg sm:text-xl">Atualizar Produto</DialogTitle>
+          <DialogDescription className="text-sm">
             Modifique as informações do produto
           </DialogDescription>
         </DialogHeader>
         
         <div className="space-y-4">
           <div>
-            <Label htmlFor="productName">Nome do Produto</Label>
+            <Label htmlFor="productName" className="text-sm">Nome do Produto</Label>
             <Input
               id="productName"
               value={editedProduct.name}
               onChange={(e) => setEditedProduct({...editedProduct, name: e.target.value})}
-              className="mt-1"
+              className="mt-1 text-sm"
             />
           </div>
           
           <div>
-            <Label htmlFor="productCategory">Categoria</Label>
+            <Label htmlFor="productCategory" className="text-sm">Categoria</Label>
             <Select value={editedProduct.category} onValueChange={(value) => setEditedProduct({...editedProduct, category: value})}>
               <SelectTrigger className="mt-1">
                 <SelectValue />
@@ -103,14 +103,14 @@ const ProductEditor = ({ product, isOpen, onClose, onUpdate }: ProductEditorProp
           </div>
           
           <div>
-            <Label>Quantidade Atual: {editedProduct.quantity}</Label>
-            <div className="flex items-center space-x-2 mt-2">
+            <Label className="text-sm">Quantidade Atual: {editedProduct.quantity}</Label>
+            <div className="grid grid-cols-2 sm:flex sm:items-center gap-2 mt-2">
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuantityChange('remove', 1)}
-                className="text-red-600 hover:text-red-800"
+                className="text-red-600 hover:text-red-800 text-xs"
               >
                 -1
               </Button>
@@ -119,7 +119,7 @@ const ProductEditor = ({ product, isOpen, onClose, onUpdate }: ProductEditorProp
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuantityChange('remove', 5)}
-                className="text-red-600 hover:text-red-800"
+                className="text-red-600 hover:text-red-800 text-xs"
               >
                 -5
               </Button>
@@ -127,14 +127,14 @@ const ProductEditor = ({ product, isOpen, onClose, onUpdate }: ProductEditorProp
                 type="number"
                 value={editedProduct.quantity}
                 onChange={(e) => setEditedProduct({...editedProduct, quantity: parseInt(e.target.value) || 0})}
-                className="w-20 text-center"
+                className="col-span-2 sm:col-span-1 sm:w-16 text-center text-sm"
               />
               <Button
                 type="button"
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuantityChange('add', 5)}
-                className="text-green-600 hover:text-green-800"
+                className="text-green-600 hover:text-green-800 text-xs"
               >
                 +5
               </Button>
@@ -143,41 +143,41 @@ const ProductEditor = ({ product, isOpen, onClose, onUpdate }: ProductEditorProp
                 variant="outline"
                 size="sm"
                 onClick={() => handleQuantityChange('add', 1)}
-                className="text-green-600 hover:text-green-800"
+                className="text-green-600 hover:text-green-800 text-xs"
               >
                 +1
               </Button>
             </div>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <Label htmlFor="minStock">Estoque Mínimo</Label>
+              <Label htmlFor="minStock" className="text-sm">Estoque Mínimo</Label>
               <Input
                 id="minStock"
                 type="number"
                 value={editedProduct.minStock}
                 onChange={(e) => setEditedProduct({...editedProduct, minStock: parseInt(e.target.value) || 0})}
-                className="mt-1"
+                className="mt-1 text-sm"
               />
             </div>
             
             <div>
-              <Label htmlFor="location">Localização</Label>
+              <Label htmlFor="location" className="text-sm">Localização</Label>
               <Input
                 id="location"
                 value={editedProduct.location}
                 onChange={(e) => setEditedProduct({...editedProduct, location: e.target.value})}
-                className="mt-1"
+                className="mt-1 text-sm"
               />
             </div>
           </div>
           
-          <div className="flex justify-end space-x-3">
-            <Button type="button" variant="outline" onClick={onClose}>
+          <div className="flex flex-col sm:flex-row justify-end gap-2 sm:gap-3 pt-4">
+            <Button type="button" variant="outline" onClick={onClose} className="text-sm">
               Cancelar
             </Button>
-            <Button type="button" onClick={handleSave} className="bg-gray-800 hover:bg-gray-900">
+            <Button type="button" onClick={handleSave} className="bg-gray-800 hover:bg-gray-900 text-sm">
               Salvar Alterações
             </Button>
           </div>

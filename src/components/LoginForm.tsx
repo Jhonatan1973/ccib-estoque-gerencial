@@ -38,26 +38,26 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200 p-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-white rounded-full shadow-lg mb-4">
-            <Shield className="w-8 h-8 text-gray-700" />
+      <div className="w-full max-w-sm sm:max-w-md">
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-full shadow-lg mb-3 sm:mb-4">
+            <Shield className="w-6 h-6 sm:w-8 sm:h-8 text-gray-700" />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Sistema de Estoque</h1>
-          <p className="text-gray-600">Congregação Cristã no Brasil</p>
+          <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Sistema de Estoque</h1>
+          <p className="text-sm sm:text-base text-gray-600">Congregação Cristã no Brasil</p>
         </div>
 
         <Card className="shadow-xl border-0">
-          <CardHeader className="space-y-1">
-            <CardTitle className="text-xl text-center text-gray-800">Acesso ao Sistema</CardTitle>
-            <CardDescription className="text-center">
+          <CardHeader className="space-y-1 px-4 sm:px-6">
+            <CardTitle className="text-lg sm:text-xl text-center text-gray-800">Acesso ao Sistema</CardTitle>
+            <CardDescription className="text-center text-sm">
               Entre com suas credenciais para acessar o controle de estoque
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-4 px-4 sm:px-6">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-gray-700">Email</Label>
+                <Label htmlFor="email" className="text-gray-700 text-sm">Email</Label>
                 <div className="relative">
                   <Mail className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
@@ -66,14 +66,14 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
                     placeholder="seu.email@ccb.org.br"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="pl-10 bg-gray-50 border-gray-200 focus:border-gray-400"
+                    className="pl-10 bg-gray-50 border-gray-200 focus:border-gray-400 text-sm"
                     required
                   />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-gray-700">Senha</Label>
+                <Label htmlFor="password" className="text-gray-700 text-sm">Senha</Label>
                 <div className="relative">
                   <Lock className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
                   <Input
@@ -82,7 +82,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
                     placeholder="Digite sua senha"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="pl-10 bg-gray-50 border-gray-200 focus:border-gray-400"
+                    className="pl-10 bg-gray-50 border-gray-200 focus:border-gray-400 text-sm"
                     required
                   />
                 </div>
@@ -90,7 +90,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
 
               <Button 
                 type="submit" 
-                className="w-full bg-gray-800 hover:bg-gray-900 text-white"
+                className="w-full bg-gray-800 hover:bg-gray-900 text-white text-sm"
                 disabled={isLoading}
               >
                 {isLoading ? "Entrando..." : "Entrar"}
@@ -109,7 +109,7 @@ const LoginForm = ({ onLogin }: LoginFormProps) => {
             <Button
               type="button"
               variant="outline"
-              className="w-full border-gray-200 hover:bg-gray-50"
+              className="w-full border-gray-200 hover:bg-gray-50 text-sm"
               onClick={handleGoogleLogin}
               disabled={isLoading}
             >
