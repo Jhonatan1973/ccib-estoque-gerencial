@@ -25,13 +25,18 @@ const AuthForm = () => {
   const { data: setores } = useQuery({
     queryKey: ['setores'],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from('setores')
-        .select('*')
-        .order('nome');
-      
-      if (error) throw error;
-      return data;
+      try {
+        const { data, error } = await supabase
+          .from('setores')
+          .select('*')
+          .order('nome');
+        
+        if (error) throw error;
+        return data || [];
+      } catch (error) {
+        console.error('Error fetching setores:', error);
+        return [];
+      }
     }
   });
 
@@ -191,7 +196,7 @@ const AuthForm = () => {
                       <SelectValue placeholder="Selecione seu setor" />
                     </SelectTrigger>
                     <SelectContent>
-                      {setores?.map((setor) => (
+                      {setores?.map((setor: any) => (
                         <SelectItem key={setor.id} value={setor.id}>
                           {setor.nome}
                         </SelectItem>

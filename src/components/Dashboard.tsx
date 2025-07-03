@@ -3,11 +3,12 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Plus, Package, Table, BarChart3, Settings, Menu, Users } from "lucide-react";
+import { LogOut, Package, Table, BarChart3, Settings, Menu, Users } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import TableManager from "./TableManager";
 import ProductManager from "./ProductManager";
 import StockOverview from "./StockOverview";
+import SetorSettings from "./SetorSettings";
 
 const Dashboard = () => {
   const { user, signOut, userProfile } = useAuth();
@@ -134,32 +135,7 @@ const Dashboard = () => {
               </CardContent>
             </Card>
           )}
-          {activeTab === "settings" && (
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg sm:text-xl">Configurações do Sistema</CardTitle>
-                <CardDescription className="text-sm">
-                  Personalize as configurações do seu sistema de estoque
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div>
-                    <h3 className="font-medium text-gray-900">Informações do Setor</h3>
-                    <p className="text-sm text-gray-600">
-                      Setor: {userProfile?.setores?.nome || 'Não definido'}
-                    </p>
-                    <p className="text-sm text-gray-600">
-                      Permissão: {userProfile?.user_roles?.[0]?.role || 'user'}
-                    </p>
-                  </div>
-                  <p className="text-gray-600 text-sm sm:text-base">
-                    Outras configurações em desenvolvimento...
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+          {activeTab === "settings" && <SetorSettings />}
         </div>
       </div>
     </div>

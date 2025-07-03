@@ -40,12 +40,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (session?.user) {
           // Fetch user profile
           setTimeout(async () => {
-            const { data: profile } = await supabase
-              .from('profiles')
-              .select('*, setores(*), user_roles(*)')
-              .eq('id', session.user.id)
-              .single();
-            setUserProfile(profile);
+            try {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select(`
+                  *,
+                  setores:setor_id(id, nome),
+                  user_roles(role)
+                `)
+                .eq('id', session.user.id)
+                .single();
+              setUserProfile(profile);
+            } catch (error) {
+              console.error('Error fetching profile:', error);
+            }
           }, 0);
         } else {
           setUserProfile(null);

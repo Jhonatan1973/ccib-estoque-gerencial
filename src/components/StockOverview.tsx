@@ -2,26 +2,51 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Package, AlertTriangle, TrendingUp, Calendar } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 const StockOverview = () => {
+  const { userProfile } = useAuth();
+
+  // Buscar estatísticas reais do banco
+  const { data: stats } = useQuery({
+    queryKey: ['stock-stats', userProfile?.setor_id],
+    queryFn: async () => {
+      if (!userProfile?.setor_id) return null;
+
+      try {
+        // Contar tabelas
+        const { count: tablesCount } = await supabase
+          .from('custom_tables')
+          .select('*', { count: 'exact', head: true })
+          .eq('setor_id', userProfile.setor_id);
+
+        // Contar produtos
+        const { count: productsCount } = await supabase
+          .from('table_products')
+          .select('*', { count: 'exact', head: true })
+          .eq('setor_id', userProfile.setor_id);
+
+        return {
+          tables: tablesCount || 0,
+          products: productsCount || 0,
+          movements: 0, // Implementar quando tiver sistema de movimentação
+          lastUpdate: new Date().toLocaleString('pt-BR')
+        };
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        return { tables: 0, products: 0, movements: 0, lastUpdate: 'Nunca' };
+      }
+    },
+    enabled: !!userProfile?.setor_id
+  });
+
   const stockData = [
-    { name: "Produtos Cadastrados", value: 150, icon: Package, color: "bg-blue-500" },
-    { name: "Estoque Baixo", value: 12, icon: AlertTriangle, color: "bg-red-500" },
-    { name: "Movimentações Hoje", value: 35, icon: TrendingUp, color: "bg-green-500" },
-    { name: "Última Atualização", value: "Agora", icon: Calendar, color: "bg-gray-500" },
-  ];
-
-  const recentMovements = [
-    { product: "Hinário 5", action: "Entrada", quantity: 50, date: "Hoje às 14:30" },
-    { product: "Revista Mensageiro", action: "Saída", quantity: 20, date: "Hoje às 13:15" },
-    { product: "Folhetos", action: "Entrada", quantity: 100, date: "Hoje às 10:45" },
-    { product: "CD Hinos CCB", action: "Saída", quantity: 15, date: "Ontem às 16:20" },
-  ];
-
-  const lowStockItems = [
-    { name: "Hinário 4", current: 5, minimum: 20, category: "Publicações" },
-    { name: "Envelopes Oferta", current: 8, minimum: 50, category: "Material" },
-    { name: "Canetas", current: 3, minimum: 25, category: "Escritório" },
+    { name: "Tabelas Criadas", value: stats?.tables || 0, icon: Package, color: "bg-blue-500" },
+    { name: "Produtos Cadastrados", value: stats?.products || 0, icon: AlertTriangle, color: "bg-green-500" },
+    { name: "Movimentações", value: stats?.movements || 0, icon: TrendingUp, color: "bg-purple-500" },
+    { name: "Última Atualização", value: stats?.lastUpdate || "Nunca", icon: Calendar, color: "bg-gray-500" },
   ];
 
   return (
@@ -49,59 +74,65 @@ const StockOverview = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Movements */}
+        {/* Status */}
         <Card className="border-0 shadow-md">
           <CardHeader>
-            <CardTitle className="text-gray-900">Movimentações Recentes</CardTitle>
-            <CardDescription>Últimas entradas e saídas do estoque</CardDescription>
+            <CardTitle className="text-gray-900">Status do Sistema</CardTitle>
+            <CardDescription>Informações sobre seu setor</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {recentMovements.map((movement, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                  <div>
-                    <p className="font-medium text-gray-900">{movement.product}</p>
-                    <p className="text-sm text-gray-500">{movement.date}</p>
-                  </div>
-                  <div className="text-right">
-                    <Badge
-                      variant={movement.action === "Entrada" ? "default" : "secondary"}
-                      className={movement.action === "Entrada" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}
-                    >
-                      {movement.action} ({movement.quantity})
-                    </Badge>
-                  </div>
+              <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">Setor Ativo</p>
+                  <p className="text-sm text-gray-500">{userProfile?.setores?.nome || 'Não definido'}</p>
                 </div>
-              ))}
+                <Badge className="bg-green-100 text-green-800">
+                  Ativo
+                </Badge>
+              </div>
+              
+              <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                <div>
+                  <p className="font-medium text-gray-900">Permissão</p>
+                  <p className="text-sm text-gray-500">{userProfile?.user_roles?.[0]?.role || 'user'}</p>
+                </div>
+                <Badge variant="secondary">
+                  {userProfile?.user_roles?.[0]?.role || 'user'}
+                </Badge>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Low Stock Alert */}
+        {/* Instruções */}
         <Card className="border-0 shadow-md">
           <CardHeader>
-            <CardTitle className="text-gray-900 flex items-center">
-              <AlertTriangle className="w-5 h-5 mr-2 text-red-500" />
-              Estoque Baixo
-            </CardTitle>
-            <CardDescription>Itens que precisam de reposição</CardDescription>
+            <CardTitle className="text-gray-900">Primeiros Passos</CardTitle>
+            <CardDescription>Configure seu sistema de estoque</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              {lowStockItems.map((item, index) => (
-                <div key={index} className="flex items-center justify-between p-3 bg-red-50 rounded-lg border border-red-100">
-                  <div>
-                    <p className="font-medium text-gray-900">{item.name}</p>
-                    <p className="text-sm text-gray-600">{item.category}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-medium text-red-600">
-                      {item.current} / {item.minimum}
-                    </p>
-                    <p className="text-xs text-red-500">Estoque mínimo</p>
-                  </div>
-                </div>
-              ))}
+              <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
+                <p className="font-medium text-gray-900 mb-2">1. Criar Tabelas</p>
+                <p className="text-sm text-gray-600">
+                  Vá em "Gerenciar Tabelas" para criar suas primeiras tabelas de produtos.
+                </p>
+              </div>
+              
+              <div className="p-3 bg-green-50 rounded-lg border border-green-100">
+                <p className="font-medium text-gray-900 mb-2">2. Adicionar Produtos</p>
+                <p className="text-sm text-gray-600">
+                  Depois, use "Produtos" para cadastrar itens em suas tabelas.
+                </p>
+              </div>
+              
+              <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                <p className="font-medium text-gray-900 mb-2">3. Configurar Setor</p>
+                <p className="text-sm text-gray-600">
+                  Configure seu setor em "Configurações" para personalizar o sistema.
+                </p>
+              </div>
             </div>
           </CardContent>
         </Card>
