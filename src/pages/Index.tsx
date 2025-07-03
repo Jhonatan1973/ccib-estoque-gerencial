@@ -1,30 +1,34 @@
 
-import { useState } from "react";
-import LoginForm from "../components/LoginForm";
-import Dashboard from "../components/Dashboard";
+import { useAuth, AuthProvider } from "@/hooks/useAuth";
+import AuthForm from "@/components/AuthForm";
+import Dashboard from "@/components/Dashboard";
 
-const Index = () => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
+const AppContent = () => {
+  const { user, loading } = useAuth();
 
-  const handleLogin = (userData: any) => {
-    setUser(userData);
-    setIsAuthenticated(true);
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setIsAuthenticated(false);
-  };
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {!isAuthenticated ? (
-        <LoginForm onLogin={handleLogin} />
-      ) : (
-        <Dashboard user={user} onLogout={handleLogout} />
-      )}
+      {!user ? <AuthForm /> : <Dashboard />}
     </div>
+  );
+};
+
+const Index = () => {
+  return (
+    <AuthProvider>
+      <AppContent />
+    </AuthProvider>
   );
 };
 

@@ -3,17 +3,14 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Plus, Package, Table, BarChart3, Settings, Menu } from "lucide-react";
+import { LogOut, Plus, Package, Table, BarChart3, Settings, Menu, Users } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
 import TableManager from "./TableManager";
 import ProductManager from "./ProductManager";
 import StockOverview from "./StockOverview";
 
-interface DashboardProps {
-  user: any;
-  onLogout: () => void;
-}
-
-const Dashboard = ({ user, onLogout }: DashboardProps) => {
+const Dashboard = () => {
+  const { user, signOut, userProfile } = useAuth();
   const [activeTab, setActiveTab] = useState("overview");
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -21,8 +18,13 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
     { id: "overview", label: "Visão Geral", icon: BarChart3 },
     { id: "tables", label: "Gerenciar Tabelas", icon: Table },
     { id: "products", label: "Produtos", icon: Package },
+    { id: "users", label: "Usuários", icon: Users },
     { id: "settings", label: "Configurações", icon: Settings },
   ];
+
+  const handleLogout = async () => {
+    await signOut();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -35,7 +37,9 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
                 <Package className="w-6 h-6 sm:w-8 sm:h-8 text-gray-700" />
                 <div className="hidden sm:block">
                   <h1 className="text-lg sm:text-xl font-bold text-gray-900">Sistema de Estoque</h1>
-                  <p className="text-xs sm:text-sm text-gray-500">Congregação Cristã no Brasil</p>
+                  <p className="text-xs sm:text-sm text-gray-500">
+                    {userProfile?.setores?.nome || 'Congregação Cristã no Brasil'}
+                  </p>
                 </div>
                 <div className="sm:hidden">
                   <h1 className="text-lg font-bold text-gray-900">Estoque CCB</h1>
@@ -45,13 +49,20 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
             
             <div className="flex items-center space-x-2 sm:space-x-4">
               <div className="hidden sm:block text-right">
-                <p className="text-sm font-medium text-gray-900">{user?.name}</p>
-                <p className="text-xs text-gray-500">{user?.email}</p>
+                <p className="text-sm font-medium text-gray-900">{userProfile?.nome || user?.email}</p>
+                <div className="flex items-center space-x-1">
+                  <p className="text-xs text-gray-500">{user?.email}</p>
+                  {userProfile?.user_roles?.[0]?.role && (
+                    <Badge variant="secondary" className="text-xs">
+                      {userProfile.user_roles[0].role}
+                    </Badge>
+                  )}
+                </div>
               </div>
               <Button
                 variant="outline"
                 size="sm"
-                onClick={onLogout}
+                onClick={handleLogout}
                 className="border-gray-200 hover:bg-gray-50 text-xs sm:text-sm"
               >
                 <LogOut className="w-3 h-3 sm:w-4 sm:h-4 sm:mr-2" />
@@ -108,6 +119,21 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
           {activeTab === "overview" && <StockOverview />}
           {activeTab === "tables" && <TableManager />}
           {activeTab === "products" && <ProductManager />}
+          {activeTab === "users" && (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-lg sm:text-xl">Gerenciar Usuários</CardTitle>
+                <CardDescription className="text-sm">
+                  Controle de usuários e permissões do seu setor
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 text-sm sm:text-base">
+                  Funcionalidade em desenvolvimento...
+                </p>
+              </CardContent>
+            </Card>
+          )}
           {activeTab === "settings" && (
             <Card>
               <CardHeader>
@@ -117,7 +143,20 @@ const Dashboard = ({ user, onLogout }: DashboardProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <p className="text-gray-600 text-sm sm:text-base">Configurações em desenvolvimento...</p>
+                <div className="space-y-4">
+                  <div>
+                    <h3 className="font-medium text-gray-900">Informações do Setor</h3>
+                    <p className="text-sm text-gray-600">
+                      Setor: {userProfile?.setores?.nome || 'Não definido'}
+                    </p>
+                    <p className="text-sm text-gray-600">
+                      Permissão: {userProfile?.user_roles?.[0]?.role || 'user'}
+                    </p>
+                  </div>
+                  <p className="text-gray-600 text-sm sm:text-base">
+                    Outras configurações em desenvolvimento...
+                  </p>
+                </div>
               </CardContent>
             </Card>
           )}
